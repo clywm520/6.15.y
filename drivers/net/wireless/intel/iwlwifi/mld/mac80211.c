@@ -995,6 +995,7 @@ int iwl_mld_assign_vif_chanctx(struct ieee80211_hw *hw,
 
 		/* Indicate to mac80211 that EML is enabled */
 		vif->driver_flags |= IEEE80211_VIF_EML_ACTIVE;
+		mld_vif->emlsr.last_entry_ts = jiffies;
 
 		if (vif->active_links & BIT(mld_vif->emlsr.selected_links))
 			mld_vif->emlsr.primary = mld_vif->emlsr.selected_primary;
@@ -2460,7 +2461,7 @@ iwl_mld_change_vif_links(struct ieee80211_hw *hw,
 		added |= BIT(0);
 
 	for (int i = 0; i < IEEE80211_MLD_MAX_NUM_LINKS; i++) {
-		if (removed & BIT(i))
+		if (removed & BIT(i) && !WARN_ON(!old[i]))
 			iwl_mld_remove_link(mld, old[i]);
 	}
 
